@@ -83,7 +83,7 @@
             <div id="paymentBlock" class="pay-section">
                 <div class="qr-container">
                     <p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600;">สแกน QR Code เพื่อโอนเงิน</p>
-                    <img src="1787317729461.jpg" alt="QR Code">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=PROMPTPAY_HERE" alt="QR Code">
                 </div>
                 <div class="form-group" style="margin-bottom: 0;">
                     <label>อัปโหลดสลิปโอนเงิน</label>
@@ -121,10 +121,6 @@
     // ใส่ SheetDB API URL เรียบร้อยแล้ว
     const SCRIPT_URL = "https://sheetdb.io/api/v1/3kjrz95xlz3t0"; 
     const SECRET_KEY = "1234";
-    // --- สวิตช์ปิดระบบ ---
-const IS_CLOSED = true; // เปลี่ยนเป็น true เพื่อปิดรับคิว, false เพื่อเปิดปกติ
-// ------------------
-    
 
     let queue = [];
     let isAdmin = false;
@@ -156,15 +152,6 @@ const IS_CLOSED = true; // เปลี่ยนเป็น true เพื่�
     }
 
     async function fetchQueue() {
-        // [เพิ่มตรงนี้] เช็กว่าปิดระบบหรือยัง
-        if (IS_CLOSED) {
-            document.getElementById('queueForm').innerHTML = '<div style="padding:20px; text-align:center; background:#fee2e2; color:#991b1b; border-radius:8px; font-weight:bold;">⚠️ ปิดรับสมัครคิวชั่วคราว<br>ขออภัยครับ ขณะนี้คิวเต็มหรือปิดรับสมัครชั่วคราว</div>';
-        }
-
-        try {
-            const res = await fetch(SCRIPT_URL);
-            // ... (โค้ดเดิมที่เหลือปล่อยไว้)
-            
         try {
             const res = await fetch(SCRIPT_URL);
             queue = await res.json();
@@ -322,5 +309,5 @@ const IS_CLOSED = true; // เปลี่ยนเป็น true เพื่�
 </script>
 
 </body>
-  </html>
-  
+</html>
+
