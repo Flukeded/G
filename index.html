@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบต่อคิวจ้างงาน</title>
+    <style>
+        :root { --primary: #2563eb; --bg: #f8fafc; --danger: #ef4444; }
+        body { font-family: 'Kanit', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #334155; }
+        .container { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        @media (max-width: 768px) { .container { grid-template-columns: 1fr; } }
+        .card { background: white; padding: 24px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        h2 { margin-top: 0; color: #0f172a; font-size: 1.25rem; }
+        
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 0.9rem; }
+        input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; font-family: inherit; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 12px; }
+        .radio-group label { font-weight: normal; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+        
+        .pay-section { background: #f1f5f9; padding: 16px; border-radius: 8px; margin-top: 16px; }
+        .qr-container { text-align: center; margin-bottom: 12px; }
+        .qr-container img { width: 160px; height: 160px; border-radius: 8px; border: 1px solid #cbd5e1; background: #fff; }
+        
+        button { width: 100%; background: var(--primary); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 10px; }
+        button:hover { opacity: 0.9; }
+        button:disabled { background: #94a3b8; cursor: not-allowed; }
+        
+        .notice-box { background: #fef2f2; border: 2px solid #fca5a5; border-radius: 8px; padding: 12px; margin-bottom: 16px; color: var(--danger); font-weight: 600; font-size: 0.88rem; line-height: 1.4; display: flex; align-items: center; gap: 12px; }
+        .notice-gif { width: 70px; height: 70px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+        
+        .queue-item { background: #ffffff; border: 1px solid #e2e8f0; border-left: 4px solid var(--primary); padding: 14px; margin-bottom: 10px; border-radius: 6px; position: relative; }
+        .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600; }
+        .badge-package { background: #e0e7ff; color: #3730a3; }
+        .badge-separate { background: #fef3c7; color: #92400e; }
+        
+        /* กล่องข้อมูลลับสำหรับ Admin */
+        .admin-data-box { background: #f1f5f9; border: 1px dashed #2563eb; padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.85rem; }
+        .btn-download { display: inline-block; background: #3b82f6; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75rem; text-decoration: none; margin-right: 4px; margin-top: 4px; }
+        .btn-finish { background: #10b981; color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; cursor: pointer; margin-top: 10px; width: auto; }
+        .admin-panel { background: #f8fafc; border: 1px dashed #cbd5e1; padding: 10px; border-radius: 6px; margin-top: 20px; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- ฟอร์มลงคิว -->
+    <div class="card">
+        <h2>ลงทะเบียนต่อคิวจ้างงาน</h2>
+        <form id="queueForm">
+            <div class="form-group">
+                <label>ชื่อผู้ว่าจ้าง</label>
+                <input type="text" id="name" required placeholder="ใส่ชื่อหรือชื่อแอคเคานต์">
+            </div>
+
+            <div class="form-group">
+                <label>รายละเอียดสิ่งที่จะจ้าง</label>
+                <textarea id="details" rows="3" required placeholder="ระบุรายละเอียดงานแบบย่อ"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label>รูปภาพประกอบ/ตัวอย่างงาน (เลือกได้หลายรูป)</label>
+                <input type="file" id="jobImages" accept="image/*" multiple style="font-size: 0.85rem;">
+            </div>
+
+            <div class="form-group">
+                <label>รูปแบบงาน</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="jobType" value="แบบเหมา" checked> แบบเหมา</label>
+                    <label><input type="radio" name="jobType" value="แบบแยก"> แบบแยก</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>เงื่อนไขการชำระเงิน</label>
+                <div class="radio-group">
+                    <label><input type="radio" name="payOption" value="โอนเลย" checked onchange="handlePayOptionChange()"> โอนเลย</label>
+                    <label><input type="radio" name="payOption" value="ผ่อนชำระ" onchange="handlePayOptionChange()"> ผ่อนชำระ</label>
+                    <label><input type="radio" name="payOption" value="จ่ายสด" onchange="handlePayOptionChange()"> จ่ายสด</label>
+                </div>
+            </div>
+
+            <div id="paymentBlock" class="pay-section">
+                <div class="qr-container">
+                    <p style="margin: 0 0 8px 0; font-size: 0.85rem; font-weight: 600;">สแกน QR Code เพื่อโอนเงิน</p>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=PROMPTPAY_HERE" alt="QR Code">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>อัปโหลดสลิปโอนเงิน</label>
+                    <input type="file" id="slipFile" accept="image/*" style="font-size: 0.85rem;">
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">ยืนยันการต่อคิว</button>
+        </form>
+    </div>
+
+    <!-- รายการคิว -->
+    <div class="card">
+        <h2>คิวปัจจุบัน (<span id="queueCount">0</span>)</h2>
+        
+        <div class="notice-box">
+            <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExOHY1YTI4dmpxaHB2dThmdWlhbmVmcXBsbzYyY3Fua3U0NDk0dWplMCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3o7TKSjRrfIPjeiVyM/giphy.gif" class="notice-gif" alt="GIF">
+            <div>
+                ⚠️ หมายเหตุ: งานจะรันคิวเอง ขึ้นอยู่กับว่าเสร็จเร็วไม่เร็ว เพราะงั้นตอนจ้างโปรดดูคิว!
+            </div>
+        </div>
+
+        <div id="queueList">กำลังโหลดคิว...</div>
+
+        <!-- แผงเจ้าของร้าน -->
+        <div class="admin-panel">
+            <label style="margin-bottom:4px;">🔑 สิทธิ์เจ้าของร้าน:</label>
+            <input type="password" id="adminKey" placeholder="ใส่รหัสเพื่อดูรายละเอียดงานและรูปภาพ" oninput="toggleAdminMode()" style="padding: 6px; font-size: 0.8rem;">
+            <small style="color: #64748b; display: block; margin-top: 4px;"><strong></strong></small>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ใส่ SheetDB API URL เรียบร้อยแล้ว
+    const SCRIPT_URL = "https://sheetdb.io/api/v1/3kjrz95xlz3t0"; 
+    const SECRET_KEY = "1234";
+
+    let queue = [];
+    let isAdmin = false;
+
+    function handlePayOptionChange() {
+        const payOption = document.querySelector('input[name="payOption"]:checked').value;
+        const paymentBlock = document.getElementById('paymentBlock');
+        const slipInput = document.getElementById('slipFile');
+
+        if (payOption === 'โอนเลย') {
+            paymentBlock.style.display = 'block';
+            slipInput.required = true;
+        } else {
+            paymentBlock.style.display = 'none';
+            slipInput.required = false;
+            slipInput.value = '';
+        }
+    }
+
+    handlePayOptionChange();
+
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+
+    async function fetchQueue() {
+        try {
+            const res = await fetch(SCRIPT_URL);
+            queue = await res.json();
+            updateQueueDisplay();
+        } catch (err) {
+            document.getElementById('queueList').innerHTML = '<p style="color: red;">โหลดข้อมูลคิวไม่สำเร็จ</p>';
+        }
+    }
+
+    function toggleAdminMode() {
+        const inputKey = document.getElementById('adminKey').value;
+        isAdmin = (inputKey === SECRET_KEY);
+        updateQueueDisplay();
+    }
+
+    document.getElementById('queueForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.innerText = "กำลังบันทึกข้อมูล...";
+
+        const name = document.getElementById('name').value;
+        const details = document.getElementById('details').value;
+        const jobType = document.querySelector('input[name="jobType"]:checked').value;
+        const payOption = document.querySelector('input[name="payOption"]:checked').value;
+        
+        const jobImageFiles = document.getElementById('jobImages').files;
+        let jobImageUrls = [];
+        for (let i = 0; i < jobImageFiles.length; i++) {
+            const base64Img = await fileToBase64(jobImageFiles[i]);
+            jobImageUrls.push(base64Img);
+        }
+
+        const slipFile = document.getElementById('slipFile').files[0];
+        let slipUrl = "";
+        if (slipFile) {
+            slipUrl = await fileToBase64(slipFile);
+        }
+
+        const newItem = {
+            data: {
+                id: Date.now().toString(),
+                name: name,
+                details: details,
+                jobType: jobType,
+                payOption: payOption,
+                slipUrl: slipUrl,
+                jobImages: JSON.stringify(jobImageUrls)
+            }
+        };
+
+        await fetch(SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(newItem)
+        });
+
+        this.reset();
+        handlePayOptionChange();
+        submitBtn.disabled = false;
+        submitBtn.innerText = "ยืนยันการต่อคิว";
+        fetchQueue();
+    });
+
+    async function finishQueue(id) {
+        if(!confirm("ยืนยันการกดจบงานคิวนี้?")) return;
+        await fetch(`${SCRIPT_URL}/id/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        });
+        fetchQueue();
+    }
+
+    function updateQueueDisplay() {
+        const queueList = document.getElementById('queueList');
+        const queueCount = document.getElementById('queueCount');
+        
+        queueList.innerHTML = '';
+        queueCount.innerText = queue.length;
+
+        if (!Array.isArray(queue) || queue.length === 0) {
+            queueList.innerHTML = '<p style="text-align: center; color: #94a3b8; margin: 30px 0;">ยังไม่มีคิวในขณะนี้</p>';
+            return;
+        }
+
+        queue.forEach((item, index) => {
+            const badgeClass = item.jobType === 'แบบเหมา' ? 'badge-package' : 'badge-separate';
+            
+            let payStatusText = '';
+            if (item.payOption === 'โอนเลย') {
+                payStatusText = `<span style="color: #16a34a; font-weight: 600;">✓ โอนแล้ว</span>`;
+            } else if (item.payOption === 'ผ่อนชำระ') {
+                payStatusText = `<span style="color: #d97706; font-weight: 600;">⏳ ผ่อนชำระ</span>`;
+            } else {
+                payStatusText = `<span style="color: #2563eb; font-weight: 600;">💵 จ่ายสด</span>`;
+            }
+
+            // ข้อมูลส่วนตัวที่จะแสดงเฉพาะ Admin
+            let adminContentHTML = '';
+            if (isAdmin) {
+                let downloadImgsHTML = '';
+                let parsedImages = [];
+                try {
+                    parsedImages = typeof item.jobImages === 'string' ? JSON.parse(item.jobImages) : item.jobImages;
+                } catch(e) { parsedImages = []; }
+
+                if (parsedImages && parsedImages.length > 0) {
+                    downloadImgsHTML = '<div style="margin-top: 6px;"><strong>รูปงานที่แนบมา:</strong><br>';
+                    parsedImages.forEach((imgUrl, imgIdx) => {
+                        downloadImgsHTML += `<a href="${imgUrl}" download="job-image-${index+1}-${imgIdx+1}.png" target="_blank" class="btn-download">💾 ดาวน์โหลดรูปที่ ${imgIdx + 1}</a>`;
+                    });
+                    downloadImgsHTML += '</div>';
+                }
+
+                let slipHTML = '';
+                if (item.slipUrl) {
+                    slipHTML = `<div style="margin-top: 4px;"><a href="${item.slipUrl}" download="slip-queue-${index+1}.png" target="_blank" style="color:#2563eb; font-weight:600;">[📄 ดาวน์โหลดสลิปโอนเงิน]</a></div>`;
+                }
+
+                adminContentHTML = `
+                    <div class="admin-data-box">
+                        <strong>📌 รายละเอียดงาน (เห็นเฉพาะเจ้าของร้าน):</strong>
+                        <p style="margin: 4px 0; color: #1e293b;">${item.details}</p>
+                        ${downloadImgsHTML}
+                        ${slipHTML}
+                        <button class="btn-finish" onclick="finishQueue('${item.id}')">✓ กดจบงาน / ลบคิว</button>
+                    </div>
+                `;
+            }
+
+            // แสดงผลสำหรับคนทั่วไป (เห็นแค่ ลำดับ, ชื่อ, รูปแบบงาน, สถานะชำระ)
+            const html = `
+                <div class="queue-item">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <strong>คิวที่ ${index + 1}: ${item.name}</strong>
+                        <span class="badge ${badgeClass}">${item.jobType}</span>
+                    </div>
+                    <div style="font-size: 0.85rem; margin-top: 6px;">
+                        สถานะชำระ: ${payStatusText}
+                    </div>
+                    ${adminContentHTML}
+                </div>
+            `;
+            queueList.innerHTML += html;
+        });
+    }
+
+    fetchQueue();
+</script>
+
+</body>
+  </html>
+  
