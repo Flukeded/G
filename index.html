@@ -1,115 +1,623 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบต่อคิวจ้างงาน</title>
-    <style>
-        * { box-sizing: border-box; font-family: sans-serif; }
-        body { 
-            background: #f0f2f5; 
-            margin: 0; 
-            padding: 20px 10px; 
-            color: #1c1e21;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff8f4">
+  <title>ระบบต่อคิวจ้างงานออนไลน์</title>
+  <style>
+    :root {
+      --ink: #302b3a;
+      --muted: #716b7a;
+      --primary: #e85d75;
+      --primary-dark: #c83f5a;
+      --peach: #fff1e8;
+      --cream: #fffaf6;
+      --purple: #7654a8;
+      --green: #278565;
+      --red: #d73f50;
+      --line: #eadfd9;
+      --white: #ffffff;
+      --shadow: 0 18px 55px rgba(91, 63, 74, 0.12);
+      --radius: 24px;
+    }
 
-        .container { 
-            max-width: 900px; 
-            margin: 0 auto; 
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px; 
-        }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      font-family: "Noto Sans Thai", "Tahoma", system-ui, -apple-system, sans-serif;
+      background:
+        radial-gradient(circle at 10% 8%, rgba(255, 190, 157, 0.28), transparent 28%),
+        radial-gradient(circle at 92% 14%, rgba(173, 141, 219, 0.20), transparent 24%),
+        linear-gradient(180deg, #fffaf6 0%, #fff7f5 48%, #faf7ff 100%);
+    }
 
-        .card { 
-            background: #ffffff; 
-            padding: 20px; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            flex: 1;
-            min-width: 300px;
-        }
-        
-        h2 { 
-            margin-top: 0; 
-            color: #4f46e5; 
-            font-size: 1.25rem;
-            border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
-        }
-        
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.9rem; }
-        input[type="text"], textarea { 
-            width: 100%; 
-            padding: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 6px; 
-            font-size: 0.95rem;
-        }
-        
-        .type-selector { display: flex; gap: 10px; }
-        .type-btn {
-            flex: 1;
-            padding: 10px;
-            background: #e5e7eb;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .type-btn.active {
-            background: #e0e7ff;
-            border-color: #4f46e5;
-            color: #4f46e5;
-        }
+    button, input, textarea { font: inherit; }
+    button { cursor: pointer; }
+    .hidden { display: none !important; }
 
-        #separateBox {
-            background: #f9fafb;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 28px 0 60px;
+    }
 
-        .total-price-box {
-            background: #e0e7ff;
-            color: #3730a3;
-            padding: 10px;
-            border-radius: 6px;
-            font-weight: bold;
-            text-align: center;
-            margin-top: 10px;
-        }
-        
-        .pay-section { 
-            background: #f9fafb; 
-            padding: 15px; 
-            border-radius: 8px; 
-            margin-top: 12px; 
-            border: 1px dashed #ccc;
-        }
-        .qr-container { text-align: center; margin-bottom: 10px; }
-        .qr-container img { width: 150px; height: 150px; border-radius: 8px; }
-        
-        button.btn-submit { 
-            width: 100%; 
-            background: #4f46e5; 
-            color: white; 
-            border: none; 
-            padding: 12px; 
-            border-radius: 8px; 
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: clamp(28px, 6vw, 62px);
+      border: 1px solid rgba(255,255,255,.8);
+      border-radius: 32px;
+      color: white;
+      background: linear-gradient(135deg, #df526f 0%, #f08a75 55%, #8364b8 120%);
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      right: -75px;
+      top: -110px;
+      border: 42px solid rgba(255,255,255,.13);
+      border-radius: 50%;
+    }
+    .hero-kicker {
+      display: inline-flex;
+      padding: 7px 12px;
+      border: 1px solid rgba(255,255,255,.35);
+      border-radius: 999px;
+      background: rgba(255,255,255,.13);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .04em;
+    }
+    .hero h1 {
+      position: relative;
+      z-index: 1;
+      max-width: 760px;
+      margin: 16px 0 10px;
+      font-size: clamp(31px, 6vw, 60px);
+      line-height: 1.08;
+      letter-spacing: -.04em;
+    }
+    .hero p {
+      position: relative;
+      z-index: 1;
+      max-width: 680px;
+      margin: 0;
+      color: rgba(255,255,255,.88);
+      font-size: clamp(15px, 2vw, 18px);
+      line-height: 1.75;
+    }
+
+    .announcement {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin: 18px 0;
+      padding: 17px 20px;
+      border: 1px solid #f0d59f;
+      border-radius: 18px;
+      background: #fff8dd;
+      color: #654b14;
+      box-shadow: 0 8px 28px rgba(125, 92, 30, .08);
+    }
+    .announcement strong { white-space: nowrap; }
+    .announcement-text { white-space: pre-wrap; line-height: 1.65; }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .stat {
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255,255,255,.82);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 8px 25px rgba(91, 63, 74, .07);
+    }
+    .stat-label { color: var(--muted); font-size: 13px; }
+    .stat-value { margin-top: 3px; font-size: 26px; font-weight: 800; }
+    .stat-value.open { color: var(--green); }
+    .stat-value.full { color: var(--red); }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(310px, .72fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .stack { display: grid; gap: 20px; }
+
+    .card {
+      padding: clamp(20px, 4vw, 30px);
+      border: 1px solid rgba(226, 213, 207, .9);
+      border-radius: var(--radius);
+      background: rgba(255,255,255,.92);
+      box-shadow: var(--shadow);
+    }
+    .sticky { position: sticky; top: 18px; }
+    .card h2, .card h3 { margin: 0; }
+    .card-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+    .card-title p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .field { margin-bottom: 18px; }
+    label, .label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .required::after { content: " *"; color: var(--red); }
+    input[type="text"], input[type="password"], textarea, input[type="file"] {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      outline: none;
+      background: #fffdfc;
+      color: var(--ink);
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+    input[type="text"], input[type="password"], textarea { padding: 13px 15px; }
+    input[type="file"] { padding: 10px; color: var(--muted); }
+    input:focus, textarea:focus {
+      border-color: #d88091;
+      background: white;
+      box-shadow: 0 0 0 4px rgba(232, 93, 117, .10);
+    }
+    textarea { min-height: 116px; resize: vertical; line-height: 1.6; }
+    .help { margin-top: 7px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+
+    .choice-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .choice-grid.three { grid-template-columns: repeat(3, 1fr); }
+    .choice {
+      position: relative;
+      display: flex;
+      min-height: 74px;
+      gap: 10px;
+      align-items: center;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fffdfc;
+      transition: .2s ease;
+    }
+    .choice:hover { border-color: #d99aa6; transform: translateY(-1px); }
+    .choice:has(input:checked) {
+      border-color: var(--primary);
+      background: #fff3f5;
+      box-shadow: 0 0 0 3px rgba(232, 93, 117, .08);
+    }
+    .choice input { width: 18px; height: 18px; accent-color: var(--primary); }
+    .choice-copy strong { display: block; font-size: 14px; }
+    .choice-copy small { color: var(--muted); }
+
+    .sub-options {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 9px;
+      margin-top: 12px;
+      padding: 15px;
+      border: 1px dashed #e1bac2;
+      border-radius: 16px;
+      background: #fff9fa;
+    }
+    .checkline {
+      display: flex;
+      gap: 9px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 12px;
+      background: white;
+      font-size: 13px;
+      font-weight: 650;
+    }
+    .checkline input { width: 17px; height: 17px; accent-color: var(--primary); }
+
+    .price-box {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 22px 0;
+      padding: 18px;
+      border-radius: 18px;
+      color: white;
+      background: linear-gradient(135deg, var(--purple), #a26da8);
+    }
+    .price-box small { display: block; color: rgba(255,255,255,.75); }
+    .price { font-size: 30px; font-weight: 900; }
+
+    .qr-wrap {
+      margin-top: 13px;
+      padding: 18px;
+      border: 1px solid #d9c9e9;
+      border-radius: 18px;
+      text-align: center;
+      background: #faf7ff;
+    }
+    .qr-wrap img {
+      display: block;
+      width: min(230px, 80%);
+      max-height: 330px;
+      object-fit: contain;
+      margin: 0 auto 10px;
+      border: 10px solid white;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(74, 52, 91, .13);
+    }
+    .qr-placeholder {
+      display: grid;
+      place-items: center;
+      width: min(230px, 80%);
+      aspect-ratio: 1;
+      margin: 0 auto 10px;
+      padding: 24px;
+      border: 2px dashed #bba8ce;
+      border-radius: 15px;
+      color: var(--muted);
+      background: white;
+      line-height: 1.6;
+    }
+    .payment-check {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 14px;
+      padding: 15px;
+      border: 1px solid #ded3ed;
+      border-radius: 16px;
+      text-align: left;
+      background: white;
+    }
+    .payment-check .field { margin: 0; }
+    .payment-check-status {
+      grid-column: 1 / -1;
+      padding: 10px 12px;
+      border-radius: 11px;
+      color: var(--muted);
+      background: #f6f2fa;
+      font-size: 12px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+    .payment-check-status.valid { color: #166148; background: #e4f8ef; }
+    .payment-check-status.invalid { color: #972435; background: #ffe7eb; }
+
+    .submit-btn, .btn {
+      border: 0;
+      border-radius: 14px;
+      font-weight: 800;
+      transition: transform .18s, box-shadow .18s, opacity .18s;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 15px 18px;
+      color: white;
+      background: linear-gradient(135deg, var(--primary), #ef806e);
+      box-shadow: 0 12px 26px rgba(216, 69, 95, .24);
+    }
+    .btn { padding: 10px 14px; }
+    .btn-primary { color: white; background: var(--primary); }
+    .btn-purple { color: white; background: var(--purple); }
+    .btn-success { color: white; background: var(--green); }
+    .btn-ghost { color: var(--ink); background: #f5efec; }
+    .submit-btn:hover:not(:disabled), .btn:hover:not(:disabled) { transform: translateY(-1px); }
+    button:disabled { cursor: not-allowed; opacity: .48; box-shadow: none; }
+
+    .alert {
+      margin-bottom: 15px;
+      padding: 13px 15px;
+      border-radius: 13px;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.55;
+    }
+    .alert-error { color: #972435; background: #ffe7eb; border: 1px solid #ffc4ce; }
+    .alert-success { color: #166148; background: #e4f8ef; border: 1px solid #b9ead5; }
+    .alert-info { color: #4d4272; background: #f0ecfa; border: 1px solid #dcd1ef; }
+
+    .queue-list { display: grid; gap: 10px; }
+    .queue-item {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #fffdfc;
+    }
+    .queue-no {
+      display: grid;
+      flex: 0 0 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 13px;
+      color: white;
+      background: var(--purple);
+      font-weight: 900;
+    }
+    .queue-main { min-width: 0; flex: 1; }
+    .queue-main strong { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .queue-main small { color: var(--muted); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      align-self: flex-start;
+      padding: 5px 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+    .badge-pending { color: #875d10; background: #fff1c9; }
+    .badge-done { color: #1e7258; background: #dff6ec; }
+    .empty {
+      padding: 25px 15px;
+      border: 1px dashed var(--line);
+      border-radius: 15px;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    details.history {
+      margin-top: 20px;
+      border-top: 1px solid var(--line);
+      padding-top: 16px;
+    }
+    details.history summary { cursor: pointer; font-weight: 800; }
+    #finishedList { margin-top: 12px; }
+
+    .admin {
+      margin-top: 20px;
+      border-color: #d9cbea;
+      background: linear-gradient(180deg, rgba(255,255,255,.96), rgba(249,246,255,.96));
+    }
+    .admin-login {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+    }
+    .admin-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin: 18px 0;
+    }
+    .admin-job {
+      padding: 17px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: white;
+    }
+    .admin-job-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .admin-job p {
+      margin: 7px 0;
+      color: #554f5d;
+      font-size: 13px;
+      line-height: 1.65;
+      overflow-wrap: anywhere;
+      white-space: pre-wrap;
+    }
+    .files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 10px 0;
+    }
+    .file-link {
+      display: inline-flex;
+      padding: 7px 10px;
+      border-radius: 10px;
+      color: #664b8f;
+      background: #f0eafa;
+      font-size: 12px;
+      font-weight: 750;
+      text-decoration: none;
+    }
+    .admin-settings {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 18px 0;
+      padding: 17px;
+      border: 1px solid #ded3ed;
+      border-radius: 17px;
+      background: #fbf9ff;
+    }
+    .admin-settings textarea { min-height: 94px; }
+    .security-note {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+    .spinner {
+      display: inline-block;
+      width: 15px;
+      height: 15px;
+      margin-right: 7px;
+      border: 2px solid currentColor;
+      border-right-color: transparent;
+      border-radius: 50%;
+      vertical-align: -2px;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @media (max-width: 860px) {
+      .layout { grid-template-columns: 1fr; }
+      .sticky { position: static; }
+      .admin-grid, .admin-settings { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 610px) {
+      .shell { width: min(100% - 18px, 1180px); padding-top: 9px; }
+      .hero { border-radius: 23px; padding: 29px 23px; }
+      .hero h1 { letter-spacing: -.025em; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .stats .stat:first-child { grid-column: 1 / -1; }
+      .stat { padding: 14px; }
+      .choice-grid, .choice-grid.three, .sub-options { grid-template-columns: 1fr; }
+      .payment-check { grid-template-columns: 1fr; }
+      .card { border-radius: 20px; padding: 20px 16px; }
+      .announcement { flex-direction: column; }
+      .admin-login { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <span class="hero-kicker">ONLINE COMMISSION QUEUE</span>
+      <h1>จองคิวจ้างงาน<br>ง่าย ครบ จบในหน้าเดียว</h1>
+      <p>กรอกรายละเอียด เลือกรูปแบบงาน และเช็กสถานะคิวได้ทันที รองรับสูงสุด 5 คิวที่กำลังดำเนินการ</p>
+    </section>
+
+    <section id="announcementBox" class="announcement">
+      <strong>📣 ประกาศ</strong>
+      <div id="announcementText" class="announcement-text">กำลังโหลดประกาศ...</div>
+    </section>
+
+    <section class="stats" aria-label="สถิติคิว">
+      <div class="stat">
+        <div class="stat-label">สถานะรับงาน</div>
+        <div id="queueStatus" class="stat-value open">กำลังตรวจสอบ</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">คิวที่กำลังทำ</div>
+        <div id="activeCount" class="stat-value">- / 5</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">คิวว่าง</div>
+        <div id="availableCount" class="stat-value">- คิว</div>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="card">
+        <div class="card-title">
+          <div>
+            <h2>ส่งรายละเอียดจ้างงาน</h2>
+            <p>กรอกข้อมูลให้ครบเพื่อช่วยให้เริ่มงานได้เร็วขึ้น</p>
+          </div>
+        </div>
+
+        <div id="formAlert" class="hidden" role="alert"></div>
+
+        <form id="jobForm">
+          <div class="field">
+            <label class="required" for="customerName">ชื่อผู้ว่าจ้าง</label>
+            <input id="customerName" name="customerName" type="text" maxlength="80" required placeholder="ชื่อหรือชื่อเล่น">
+          </div>
+
+          <div class="field">
+            <label class="required" for="contactIg">Instagram / ช่องทางติดต่อกลับ</label>
+            <input id="contactIg" name="contactIg" type="text" maxlength="120" required placeholder="@instagram, Line ID หรือเบอร์โทร">
+          </div>
+
+          <div class="field">
+            <label class="required" for="jobDetails">รายละเอียดสิ่งที่จะจ้าง</label>
+            <textarea id="jobDetails" name="jobDetails" maxlength="5000" required placeholder="อธิบายธีม สี ข้อความ ขนาด หรือสิ่งที่ต้องการ"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="jobImages">รูปภาพตัวอย่างงาน (เลือกได้หลายรูป)</label>
+            <input id="jobImages" name="jobImages" type="file" accept="image/*" multiple>
+            <div class="help">สูงสุด 5 รูป ระบบจะย่อรูปและแปลงเป็น Base64 ก่อนส่งเข้า Google Sheets</div>
+          </div>
+
+          <div class="field">
+            <span class="label required">รูปแบบงาน</span>
+            <div class="choice-grid">
+              <label class="choice">
+                <input type="radio" name="jobType" value="package" checked>
+                <span class="choice-copy">
+                  <strong>แบบเหมา</strong>
+                  <small>ราคาเริ่มต้น 100฿</small>
+                </span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="jobType" value="separate">
+                <span class="choice-copy">
+                  <strong>แบบแยก</strong>
+                  <small>รายการละ 20฿</small>
+                </span>
+              </label>
+            </div>
+
+            <div id="subOptions" class="sub-options hidden">
+              <label class="checkline"><input type="checkbox" name="subItem" value="แบนเนอร์ 1 รูป"> แบนเนอร์ 1 รูป</label>
+              <label class="checkline"><input type="checkbox" name="subItem" value="แบนเนอร์เพิ่มอีก 1 รูป"> แบนเนอร์เพิ่มอีก 1 รูป</label>
+              <label class="checkline"><input type="checkbox" name="subItem" value="ภาพตรงกลาง"> ภาพตรงกลาง</label>
+              <label class="checkline"><input type="checkbox" name="subItem" value="ภาพเข้าหน้าเว็บ"> ภาพเข้าหน้าเว็บ</label>
+              <label class="checkline"><input id="allButtons" type="checkbox" name="subItem" value="ปุ่มทั้งหมด"> ปุ่มทั้งหมด</label>
+              <div id="buttonDetailsWrap" class="field hidden" style="grid-column: 1 / -1; margin: 4px 0 0;">
+                <label class="required" for="buttonDetails">รายละเอียดปุ่มทั้ง 5 ปุ่ม</label>
+                <textarea id="buttonDetails" maxlength="1500" placeholder="เช่น ปุ่ม 1: หน้าแรก, ปุ่ม 2: ผลงาน, ..."></textarea>
+              </div>
+            </div>
+          </div>
+
+          <div class="price-box">
+            <div>
+              <strong>ราคารวม</strong>
+              <small id="priceHint">แพ็กเกจแบบเหมา</small>
+            </div>
+            <div id="totalPrice" class="price">100฿</div>
+          </div>
+
+          <div class="field">
+            <span class="label required">เงื่อนไขการชำระเงิน</span>
+            <div class="choice-grid three">
+              <label class="choice">
+                <input type="radio" name="payment" value="โอนเลย" checked>
+                <span class="choice-copy"><strong>โอนเลย</strong><small>แนบสลิป</small></span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="payment" value="ผ่อนชำระ">
+                <span class="choice-copy"><strong>ผ่อนชำระ</strong><small>ตกลงภายหลัง</small></span>
+              </label>
+              <label class="choice">
+                <input type="radio" name="payment" value="จ่ายสด">
+                <span class="choice-copy"><strong>จ่ายสด</strong><small>ชำระเงินสด</small></span>
+              </label>
+            </div>
+
+            <div id="qrSection" class="qr-wrap">
+              <div id="qrPlaceholder" class="qr-placeholder">เจ้าของร้านยังไม่ได้เพิ่ม QR Code<br>กรุณาติดต่อร้านค้าก่อนโอน</div>
+              <img id="qrImage" class="hidden" alt="QR Code สำหรับชำระเงิน">
+              <strong>สแกนเพื่อชำระเงิน</strong>
+              <div class="help"><strong>ชื่อบัญชี: วิชิต นามบุรี</strong></div>
+              <div class="help">ตรวจสอบชื่อผู้รับและยอดเงินก่อนยืนยันทุกครั้ง</div>
+
+              <div id="paymentCheck" class="payment-check">
+                <div class="field">
+                  <label class="required" for="transferAmount">ยอดที่โอน (บาท)</l            border-radius: 8px; 
             font-size: 1rem; 
             font-weight: bold; 
             cursor: pointer; 
